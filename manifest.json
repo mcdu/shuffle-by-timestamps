@@ -1,0 +1,22 @@
+{
+
+  "manifest_version": 2,
+  "name": "Timestamp Player",
+  "version": "0.1",
+
+  "description": "Allows YouTube video shuffled playback over timestamps.",
+
+  "icons": {
+    "48": "icons/border-48.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/watch*"],
+      "js": ["inject.js"]
+    }
+  ],
+
+  "web_accessible_resources": ["timestamp-player.js"]
+
+}
