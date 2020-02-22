@@ -1,7 +1,7 @@
 function loadScript(src) {
   let script = document.createElement("script");
   script.src = browser.runtime.getURL(src);
-  script.type = "text/javascript";
+  script.type = "module";
   script.async = false;
   //
   //let code = `if(typeof chrome === "undefined")
