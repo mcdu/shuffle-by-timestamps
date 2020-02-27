@@ -14,18 +14,29 @@ class Track {
 
 function main() {
   //TODO allow ` in data
-  const rawTrackData = `
-  
-  01 Fa - Nw B 00:00 02 Yi - Riv 01:01 03 Sa - Aq 02:02 04 Ei - Le 03:03 05 Ei - Nef 03:30
-  
-  `;
+  //const rawTrackData = `
+  //
+  //01 Fa - Nw B 00:00 02 Yi - Riv 01:01 03 Ei - Le 03:03 04 Ei - Nef 03:30
+  //
+  //`;
 
-  const tstampRe = /[0-9]{1,2}:?[0-9]{1,2}:[0-9]{2}/g;
-  let tstamps = [...rawTrackData.matchAll(tstampRe)].map(match => match[0]);
-  let tstampsInSecs = tstamps.map(ts => computeTimestampSeconds(ts));
+  //const tstampRe = /[0-9]{1,2}:?[0-9]{1,2}:[0-9]{2}/g;
+  //let tstamps = [...rawTrackData.matchAll(tstampRe)].map(match => match[0]);
+  //let tstampsInSecs = tstamps.map(ts => computeTimestampSeconds(ts));
+
+  let tstampsInSecs = [];
+  let links = timeLinks();
+  for (let link of links) {
+    let match = link.href.match(/&t=([\d.]+)s/);
+    if (match) {
+      let startTime = parseFloat(match[1]);
+      tstampsInSecs.push(startTime);
+    }
+  }
+
   //TODO sort beforehand, so track num is accurate
 
-  let numTracks = tstamps.length;
+  let numTracks = tstampsInSecs.length;
   let endOfVideo = Math.floor(player.getDuration());
   let tracks = [];
   for (let i = 0; i < numTracks; i++) {
@@ -33,7 +44,30 @@ function main() {
     let end = i < numTracks - 1 ? tstampsInSecs[i+1] - 1 : endOfVideo - 1;
     tracks[i] = new Track(i, start, end);
   }
+  console.log(tracks);
   playRandDiffTrack(tracks, null);
+}
+
+
+function timeLinks() {
+  let match = location.search.match(/(?:^\?|&)v=([^&]+)(?=&|$)/);
+  if (match) {
+    let id = match[1];
+    return new Set(document.querySelectorAll(`#description a[href^="/watch?v=${id}"][href*="&t="]`));
+  }
+  return new Set();
+}
+
+
+function invokeAfterDomIsReady(func, context=document, time=400) {
+    const domEl = context.querySelectorAll(`#description`).length;
+    if (domEl != 0) {
+        func();
+    } else {
+        setTimeout(function () {
+            invokeAfterDomIsReady(func);
+        }, time);
+    }
 }
 
 
@@ -68,4 +102,5 @@ function getCurrentTrack(tracks) {
 }
 
 
-main();
+//main();
+invokeAfterDomIsReady(main);
